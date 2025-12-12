@@ -1,0 +1,6 @@
+# pyproject.toml
+[tool.ruff]
+lint.ignore = ["F401"]
+[tool.basedpyright]
+reportMissingImports = "none"
+typeCheckingMode = "basic"

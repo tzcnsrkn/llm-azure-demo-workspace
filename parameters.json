@@ -1,0 +1,9 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "adminPasswordOrKey": {
+      "value": "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCw0NZll0drh3G2d91XwqPocKrDF97lxpisDrqBWNcmksXfnVcIZ/9Ej3rMDmQXjvAanzXzPjnLcPkEq53L+otnYJ7wT1LoHq6gRKfAhMU0mo53b1YptqQ4C5aItHRJlGerivBf8DCBf8D7JMXpzc60X4ZjQ8GQdOXdfHF3LYbYCCSjs7pqO6FYgdkbJTjpdoYe5Z+N0xLVZI/N5ic2oPBRSW//cOAG+DdmhQv59TjqzzCquMU/vjAFchbTC4k0yl2IAE6WxS0QSCKJZkrzgRbffFR52cwusFmMOsjHfxeeAnL2983XCJFUUN5TYmxmb2en5dnBIWdwJ9jcODoEnzTygxzmEzTmRWTRjAhlK0HMyHdqE5wvz6X1bcu0q/xDKoKWWkuZ1Qxnrl025BmjUv1vQfQLsjgXJVMOD1rrHc2a8/cKikkQURDK6GT30u084FAKZEwlhvlsMHqhVr9muF9zQ+T8yDBhLQ8xGyNCthk109xap8ewuIrRZ8jAMteJbXoaJcSE7PL+k8mn0k6lvcEDsm0wM2koH8TAOHsnwEpLaJRou9YQBPQlbxvHDeHFpNOVXPOEHUeCCgbde/oRJvTPiVimmyuAqRcdRci9+Toj0R24ZKU/9cEPrVMWRun4INjWoVLypT0bLyp0KHtpDGSJ6ewXBQGmcexozpCYg0TxNw== serkan.h.cloud@outlook.com"
+    }
+  }
+}
