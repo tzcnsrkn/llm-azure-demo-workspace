@@ -90,6 +90,9 @@ def _(
 
 @app.cell
 def _(cnn_learner, dls, error_rate, resnet18):
+    # should_stop = True
+    # mo.stop(should_stop, mo.md("Execution stopped. Testing the previous cells only."))
+    
     # Train Model
     learn = cnn_learner(dls, resnet18, metrics=error_rate)
     learn.fine_tune(4)
