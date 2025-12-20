@@ -1,10 +1,10 @@
+#!/bin/bash
+
 #########################################################
 ######## RUN below two once copied manually #############
 #########################################################
 # chmod +x deploy.sh
 # ./deploy.sh
-
-#!/bin/bash
 
 # Exit on error
 set -e
@@ -39,3 +39,4 @@ pip install -r ~/venv/requirements.txt
 # Add --headless --no-token at the end if using LightningAI
 
 marimo edit 02_production_impro.py --host 0.0.0.0 --port 2718 --no-token
+
