@@ -13,6 +13,9 @@ set -e
 mkdir -p workspace
 cd workspace
 
+sudo apt update
+sudo apt install -y python3.10-venv
+
 # Create and activate virtual environment
 python3.10 -m venv venv
 source venv/bin/activate
@@ -34,4 +37,5 @@ pip install -r ~/venv/requirements.txt
 
 # Start marimo editor
 # Add --headless --no-token at the end if using LightningAI
+
 marimo edit 02_production_impro.py --host 0.0.0.0 --port 2718 --no-token
