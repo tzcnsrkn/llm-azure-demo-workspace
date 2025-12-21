@@ -8,12 +8,17 @@
 
 # Exit on error
 set -e
+# Azure Extension environment does not always provide it by default.
+export HOME=/root
+
+# Update apt (non-interactive to prevent debconf errors)
+export DEBIAN_FRONTEND=noninteractive
 sudo apt update
 
-# Azure extension runs as root, so $HOME is /root
+# Azure extension runs as root
 cd $HOME 
 
-# Remove existing workspace if re-running to avoid git clone errors
+# Ensure empty workspace to avoid git clone errors
 rm -rf workspace
 
 git clone https://github.com/tzcnsrkn/llm-azure-demo-workspace.git workspace
@@ -36,3 +41,4 @@ mkdir -p ~/.marimo && echo -e "[display]\ntheme = \"dark\"\ncode_editor_font_siz
 
 # Start marimo editor
 marimo edit marimo-mission/02/improvised/Update\ 02_production_impro.py --host 0.0.0.0 --port 2718 --no-token
+
