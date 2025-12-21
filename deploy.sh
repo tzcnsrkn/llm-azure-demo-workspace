@@ -24,6 +24,7 @@ rm -rf workspace
 git clone https://github.com/tzcnsrkn/llm-azure-demo-workspace.git workspace
 cd workspace
 
+sudo apt install -y python3.10-venv
 # Create and activate virtual environment
 python3.10 -m venv venv
 source venv/bin/activate
@@ -41,4 +42,5 @@ mkdir -p ~/.marimo && echo -e "[display]\ntheme = \"dark\"\ncode_editor_font_siz
 
 # Start marimo editor
 marimo edit marimo-mission/02/improvised/Update\ 02_production_impro.py --host 0.0.0.0 --port 2718 --no-token
+
 
