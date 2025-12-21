@@ -8,13 +8,16 @@
 
 # Exit on error
 set -e
-
-# Create and enter workspace directory
-mkdir -p workspace
-cd workspace
-
 sudo apt update
-sudo apt install -y python3.10-venv
+
+# Azure extension runs as root, so $HOME is /root
+cd $HOME 
+
+# Remove existing workspace if re-running to avoid git clone errors
+rm -rf workspace
+
+git clone https://github.com/tzcnsrkn/llm-azure-demo-workspace.git workspace
+cd workspace
 
 # Create and activate virtual environment
 python3.10 -m venv venv
@@ -22,21 +25,14 @@ source venv/bin/activate
 
 # Upgrade pip and install main packages
 pip install --upgrade pip
-pip install fastai jupyter marimo    # run duration: ~5.5 min
+pip install fastai jupyter marimo
 
-# Create requirements.txt
-mkdir -p ~/venv && echo -e "fastai>=2.0.0\ngraphviz\nipywidgets\nmatplotlib\nnbdev>=0.2.12\npandas\nscikit_learn\nazure-cognitiveservices-search-imagesearch\nsentencepiece\nfastbook" > ~/workspace/venv/requirements.txt
+# Install requirements from the repository root
+# This matches the file structure shown in your image
+pip install -r requirements.txt
 
-# Configure marimo with custom GUI settings
-mkdir -p ~/venv/.marimo && echo -e "[display]\ntheme = \"dark\"\ncode_editor_font_size = 16\n\n[runtime]\nauto_instantiate = true" > ~/.marimo/marimo.toml
-
-# marimo convert 01_intro.ipynb > 01_intro.py
-
-# Install requirements
-pip install -r ~/venv/requirements.txt
+# Configure marimo
+mkdir -p ~/.marimo && echo -e "[display]\ntheme = \"dark\"\ncode_editor_font_size = 16\n\n[runtime]\nauto_instantiate = true" > ~/.marimo/marimo.toml
 
 # Start marimo editor
-# Add --headless --no-token at the end if using LightningAI
-
-marimo edit 02_production_impro.py --host 0.0.0.0 --port 2718 --no-token
-
+marimo edit marimo-mission/02/improvised/Update\ 02_production_impro.py --host 0.0.0.0 --port 2718 --no-token
