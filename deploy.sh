@@ -38,9 +38,10 @@ pip install fastai jupyter marimo
 pip install -r requirements.txt
 
 # Configure marimo
-mkdir -p ~/.marimo && echo -e "[display]\ntheme = \"dark\"\ncode_editor_font_size = 16\n\n[runtime]\nauto_instantiate = true" > ~/.marimo/marimo.toml
+mkdir -p ~/.marimo && echo -e "[display]\ntheme = \"dark\"\ncode_editor_font_size = 16\n\n[runtime]\nauto_instantiate = true" > ~/.marimo/.marimo.toml
 
 # Start marimo editor
 nohup marimo edit "marimo-mission/02/improvised/02_production_impro.py" --host 0.0.0.0 --port 2718 --no-token > marimo.log 2>&1 &
+
 
 
