@@ -18,15 +18,11 @@ ENV/
 .marimo.toml
 
 # --- Terraform ---
-**/.terraform/*
+**/terraform/*
 **/.tfstate
 **/.tfstate.*
 **/.tfvars
 **/.tfvars.json
-**/override.tf
-**/override.tf.json
-**/*_override.tf
-**/*_override.tf.json
 
 # Others
 /.zed
