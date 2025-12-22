@@ -1,4 +1,36 @@
+# --- General & Credentials ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+creds.json
+secrets.json
+
+# --- Marimo / Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+.pytest_cache/
+.marimo.toml
+
+# --- Terraform ---
+**/.terraform/*
+**/.tfstate
+**/.tfstate.*
+**/.tfvars
+**/.tfvars.json
+**/override.tf
+**/override.tf.json
+**/*_override.tf
+**/*_override.tf.json
+
+# Others
+/.zed
 /book_nbs
 /chapters-my-work
 /temp.py
-marimo/
+**/__marimo__/session/*.py.json
