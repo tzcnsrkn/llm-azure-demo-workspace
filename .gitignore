@@ -15,7 +15,7 @@ __pycache__/
 venv/
 ENV/
 .pytest_cache/
-.marimo.toml
+**/.marimo.toml
 
 # --- Terraform ---
 **/terraform/*
