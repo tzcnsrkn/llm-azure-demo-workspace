@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.18.3"
+__generated_with = "0.18.4"
 app = marimo.App()
 
 
@@ -14,7 +14,7 @@ app._unparsable_cell(
     from types import SimpleNamespace
     import marimo as mo
     import requests
-    from fastai.vision.all import error_rate, resnet18, cnn_learner
+    from fastai.vision.all import error_rate, resnet18
     import builtins
     from fastai.vision.widgets import I
     from fastbook import (
@@ -89,12 +89,13 @@ def _(
 
 
 @app.cell
-def _(cnn_learner, dls, error_rate, resnet18):
+def _(vision_learner, dls, error_rate, resnet18):
     # should_stop = True
     # mo.stop(should_stop, mo.md("Execution stopped. Testing the previous cells only."))
     
     # Train Model
-    learn = cnn_learner(dls, resnet18, metrics=error_rate)
+    # https://docs.fast.ai/vision.learner.html#cnn_learner
+    learn = vision_learner(dls, resnet18, metrics=error_rate)
     learn.fine_tune(4)
     return (learn,)
 
@@ -161,6 +162,14 @@ def _(Path, dls, learn, mo, select_category, select_split, torch):
     if isinstance(targs, list):
         targs = torch.tensor(targs)
 
+    # Create a Loss Map for better visual traceability    
+    current_items = dls.train.items if ds_idx == 0 else dls.valid.items    
+    # Convert the tensor of losses into a simple list of floats    
+    loss_values = losses.view(-1).tolist()
+    # File paths with their loss values into a dictionary
+    loss_map = dict(zip(current_items, loss_values))
+    # ---
+
     # Sort by top losses
     idxs = losses.argsort(descending=True)
 
@@ -203,11 +212,22 @@ def _(Path, dls, learn, mo, select_category, select_split, torch):
         for x in top_items[:5]:
             # how marimo handles image
             img = mo.image(src=str(x), width="100px", rounded=True)
+            loss_val = loss_map.get(x, None)
+            
+            if loss_val is not None:
+                loss_label = f"<span style='color:red; font-weight:bold;'>Loss: {loss_val:.2f}</span>"
+            else:
+                loss_label = "<span style='color:blue; font-weight:bold;'>Dummy (No Loss)</span>"
+
 
             # The Text (Filename)
             # small font size and word-wrap to ensure paths don't break the layout
-            txt = mo.md(f"<div style='font-size: 10px; width: 100px; overflow-wrap: break-word; line-height: 1.1;'>{str(x)}</div>")
-
+            txt = mo.md(
+                f"<div style='font-size: 10px; width: 100px; overflow-wrap: break-word; line-height: 1.1;'>"
+                f"{loss_label}<br/>"
+                f"{x.name}"
+                f"</div>"
+            )
             # Combine vertically
             item_stack = mo.vstack([img, txt], align="center")
             gallery_items.append(item_stack)
