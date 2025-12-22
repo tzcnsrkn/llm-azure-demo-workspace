@@ -42,6 +42,7 @@ app._unparsable_cell(
     import matplotlib.pyplot as plt
     from fastcore.basics import Inf
     import torch
+
     def show_plots():
         \"\"\"Helper to automatically show fastai/matplotlib plots in Marimo\"\"\"
         return mo.mpl.interactive(plt.gcf())
@@ -89,10 +90,10 @@ def _(
 
 
 @app.cell
-def _(vision_learner, dls, error_rate, resnet18):
+def _(dls, error_rate, resnet18, vision_learner):
     # should_stop = True
     # mo.stop(should_stop, mo.md("Execution stopped. Testing the previous cells only."))
-    
+
     # Train Model
     # https://docs.fast.ai/vision.learner.html#cnn_learner
     learn = vision_learner(dls, resnet18, metrics=error_rate)
@@ -213,7 +214,7 @@ def _(Path, dls, learn, mo, select_category, select_split, torch):
             # how marimo handles image
             img = mo.image(src=str(x), width="100px", rounded=True)
             loss_val = loss_map.get(x, None)
-            
+
             if loss_val is not None:
                 loss_label = f"<span style='color:red; font-weight:bold;'>Loss: {loss_val:.2f}</span>"
             else:
