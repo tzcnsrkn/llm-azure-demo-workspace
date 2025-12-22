@@ -356,5 +356,70 @@ def _(cleaner_selector, delete_button, mo, os, set_file_list_version):
     return
 
 
+@app.cell
+def _(mo):
+    # Dropdown to select where to move the images
+    target_category_selector = mo.ui.dropdown(
+        options=["black", "grizzly", "teddy"], 
+        label="Move to Category"
+    )
+
+    # 2. Button to execute the move
+    move_button = mo.ui.run_button(label="🚚 Move Selected Images")
+
+    # Display them
+    mo.hstack([target_category_selector, move_button], justify="start")
+    return move_button, target_category_selector
+
+
+@app.cell
+def _(
+    Path,
+    cleaner_selector,
+    mo,
+    move_button,
+    set_file_list_version,
+    shutil,
+    target_category_selector,
+):
+    # STOP if the move button wasn't clicked
+    mo.stop(not move_button.value, output=mo.md(""))
+
+    # Get files and target
+    files_to_move = cleaner_selector.value
+    target_cat = target_category_selector.value
+
+    moved_count = 0
+
+    if not files_to_move:
+        result_msg = mo.md("ℹ️ No images selected to move.")
+    elif not target_cat:
+        result_msg = mo.md("⚠️ Please select a target category.")
+    else:
+        for file_path_m in files_to_move:
+            try:
+                # Convert string path to Path object
+                src_path = Path(file_path_m)
+
+                # destination: parent_dir / new_category / filename
+                dest_path = src_path.parent.parent / target_cat / src_path.name
+
+                # Ensure destination exists
+                dest_path.parent.mkdir(parents=True, exist_ok=True)
+
+                # Move the file
+                shutil.move(str(src_path), str(dest_path))
+                moved_count += 1
+            except Exception as e:
+                print(f"Error moving {file_path_m}: {e}")
+
+        # Update state to refresh the list (remove moved items from current view)
+        set_file_list_version(lambda v: v + 1)
+        result_msg = mo.md(f"✅ **Moved {moved_count} images to '{target_cat}'.**")
+
+    result_msg
+    return
+
+
 if __name__ == "__main__":
     app.run()
