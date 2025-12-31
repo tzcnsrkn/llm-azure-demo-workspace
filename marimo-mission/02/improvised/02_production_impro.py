@@ -52,29 +52,24 @@ def _():
     def show_plots():
         """Helper to automatically show fastai/matplotlib plots in Marimo"""
         return mo.mpl.interactive(plt.gcf())
-
     return (
         CategoryBlock,
         ClassificationInterpretation,
         DataBlock,
         ImageBlock,
-        L,
         Path,
         RandomResizedCrop,
         RandomSplitter,
         Resize,
         aug_transforms,
-        download_images,
         error_rate,
         get_image_files,
         mo,
         os,
         parent_label,
-        requests,
         resnet18,
         show_plots,
         shutil,
-        time,
         torch,
         verify_images,
         vision_learner,
@@ -83,9 +78,24 @@ def _():
 
 @app.cell
 def _(Path):
+
     # Setup path (Assuming the 'bears' folder exists)
-    path = Path('bears')
+    path = Path('/root/workspace/bears')
     return (path,)
+
+
+@app.cell
+def _(Path, get_image_files, path, verify_images):
+    # --- CLEANUP STEP ---
+    # This checks every file. If it's not a valid image, it unlinks (deletes) it.
+    log_output = []
+
+    log_output.append("Verifying images and removing corrupted files...")
+    failed = verify_images(get_image_files(path))
+    failed.map(Path.unlink)
+    log_output.append(f"Removed {len(failed)} corrupt images.")
+    # --------------------
+    return
 
 
 @app.cell

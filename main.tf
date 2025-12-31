@@ -45,6 +45,18 @@ variable "ssh_public_key" {
   sensitive   = true
 }
 
+variable "github_repo_url" {
+  description = "The HTTP URL of the GitHub repository"
+  type        = string
+  default = "https://github.com/tzcnsrkn/llm-azure-demo-workspace.git"
+}
+
+variable "github_dataset_path" {
+  description = "The path inside the repo where the data lives"
+  type        = string
+  default     = "datasets/bears"
+}
+
 # --- Resources ---
 
 # 1. Resource Group
@@ -179,9 +191,10 @@ resource "azurerm_linux_virtual_machine" "vm" {
   }
 }
 
-# 5. Custom Script Extension (Runs deploy.sh)
-resource "azurerm_virtual_machine_extension" "install_dependencies" {
-  name                 = "install-dependencies"
+# 5. Custom Script Extension
+# This combines downloading/running deploy.sh AND setting up the dataset
+resource "azurerm_virtual_machine_extension" "setup_full_environment" {
+  name                 = "setup-full-environment"
   virtual_machine_id   = azurerm_linux_virtual_machine.vm.id
   publisher            = "Microsoft.Azure.Extensions"
   type                 = "CustomScript"
@@ -194,8 +207,9 @@ resource "azurerm_virtual_machine_extension" "install_dependencies" {
     ]
   })
 
+  # Chaining the deployment script execution with the dataset setup
   protected_settings = jsonencode({
-    "commandToExecute": "bash deploy.sh"
+    "commandToExecute": "bash deploy.sh && sudo apt-get update && sudo apt-get install -y python3-pip python3-venv git && git clone ${var.github_repo_url} /tmp/repo_download && mv /tmp/repo_download/${var.github_dataset_path} /home/${var.admin_username}/bears && chown -R ${var.admin_username}:${var.admin_username} /home/${var.admin_username}/bears && rm -rf /tmp/repo_download"
   })
 }
 
