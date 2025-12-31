@@ -102,7 +102,7 @@ def _(requests):
 @app.cell
 def _():
     # Ideally, use an environment variable for keys, but keeping your provided key here
-    api_key = "BSAlRPIUZCDPc3TIQEbB10Jih3r9M9W"
+    api_key = "<api-secret-key>"
     return (api_key,)
 
 
