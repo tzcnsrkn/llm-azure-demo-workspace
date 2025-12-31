@@ -1,21 +1,25 @@
 import marimo
 
 __generated_with = "0.18.4"
-app = marimo.App()
+app = marimo.App(width="full")
 
 
-app._unparsable_cell(
-    r"""
+@app.cell
+def _():
+    import builtins
     import io
     import os
+    import random
     import shutil
     import time
     from pathlib import Path
     from types import SimpleNamespace
+
     import marimo as mo
+    import matplotlib.pyplot as plt
     import requests
+    import torch
     from fastai.vision.all import error_rate, resnet18
-    import builtins
     from fastai.vision.widgets import I
     from fastbook import (
         CategoryBlock,
@@ -34,21 +38,47 @@ app._unparsable_cell(
         download_images,
         download_url,
         get_image_files,
-        parent_label
+        # load_learner,
+        parent_label,
+        # resize_images,
+        verify_images,
         vision_learner,
     )
-    from PIL import Image, ImageDraw, ImageFont
-    import random
-    import matplotlib.pyplot as plt
     from fastcore.basics import Inf
-    import torch
+
+    # from fastdownload import download_u
+    from PIL import Image, ImageDraw, ImageFont
 
     def show_plots():
-        \"\"\"Helper to automatically show fastai/matplotlib plots in Marimo\"\"\"
+        """Helper to automatically show fastai/matplotlib plots in Marimo"""
         return mo.mpl.interactive(plt.gcf())
-    """,
-    name="_"
-)
+
+    return (
+        CategoryBlock,
+        ClassificationInterpretation,
+        DataBlock,
+        ImageBlock,
+        L,
+        Path,
+        RandomResizedCrop,
+        RandomSplitter,
+        Resize,
+        aug_transforms,
+        download_images,
+        error_rate,
+        get_image_files,
+        mo,
+        os,
+        parent_label,
+        requests,
+        resnet18,
+        show_plots,
+        shutil,
+        time,
+        torch,
+        verify_images,
+        vision_learner,
+    )
 
 
 @app.cell
@@ -73,16 +103,17 @@ def _(
 ):
     # Define DataBlock
     bears = DataBlock(
-        blocks=(ImageBlock, CategoryBlock), 
-        get_items=get_image_files, 
+        blocks=(ImageBlock, CategoryBlock),
+        get_items=get_image_files,
         splitter=RandomSplitter(valid_pct=0.2, seed=42),
         get_y=parent_label,
-        item_tfms=Resize(128))
+        item_tfms=Resize(128),
+    )
 
     # Augmentations
     bears = bears.new(
-        item_tfms=RandomResizedCrop(224, min_scale=0.5),
-        batch_tfms=aug_transforms())
+        item_tfms=RandomResizedCrop(224, min_scale=0.5), batch_tfms=aug_transforms()
+    )
 
     # Load Data
     dls = bears.dataloaders(path)
@@ -123,15 +154,11 @@ def _(mo):
     # Reference: https://docs.marimo.io/api/inputs/dropdown/
 
     select_split = mo.ui.dropdown(
-        options=["Train", "Valid"], 
-        value="Valid", 
-        label="Dataset Split"
+        options=["Train", "Valid"], value="Valid", label="Dataset Split"
     )
 
     select_category = mo.ui.dropdown(
-        options=["black", "grizzly", "teddy"], 
-        value="teddy", 
-        label="Category"
+        options=["black", "grizzly", "teddy"], value="teddy", label="Category"
     )
 
     mo.hstack([select_split, select_category])
@@ -139,21 +166,12 @@ def _(mo):
 
 
 @app.cell
-def _(dl, learn):
-    # Get predictions and losses
-    predst, targst, lossest = learn.get_preds(dl=dl, with_loss=True)
-    return
-
-
-@app.cell
-def _(Path, dls, learn, mo, select_category, select_split, torch):
-    # Logic to extract top losses based on dropdown selection
-
+def _(dls, learn, select_split, torch):
     ds_idx = 0 if select_split.value == "Train" else 1
     dl = dls[ds_idx]
 
     # Get predictions and losses
-    preds, targs, losses = learn.get_preds(dl=dl, with_loss=True)
+    probs, targs, losses = learn.get_preds(dl=dl, with_loss=True)
 
     # Ensure losses is a Tensor. 
     if isinstance(losses, list):
@@ -162,13 +180,39 @@ def _(Path, dls, learn, mo, select_category, select_split, torch):
     # Ensure targs is a Tensor
     if isinstance(targs, list):
         targs = torch.tensor(targs)
+    return ds_idx, losses, probs, targs
 
-    # Create a Loss Map for better visual traceability    
-    current_items = dls.train.items if ds_idx == 0 else dls.valid.items    
-    # Convert the tensor of losses into a simple list of floats    
+
+@app.cell
+def _(
+    Path,
+    dls,
+    ds_idx,
+    losses,
+    mo,
+    probs,
+    select_category,
+    select_split,
+    targs,
+):
+    # Logic to extract top losses based on dropdown selection
+
+    # Create Loss & Probability Maps for better visual traceability ---
+    current_items = dls.train.items if ds_idx == 0 else dls.valid.items
+
+    # Convert the tensor of losses into a simple list of floats
+    # .view(-1) ensures it's flat, .tolist() converts to Python floats
     loss_values = losses.view(-1).tolist()
+
     # File paths with their loss values into a dictionary
     loss_map = dict(zip(current_items, loss_values))
+
+    # Probability Map
+    max_probs, _ = probs.max(dim=1)
+    prob_values = max_probs.tolist()
+
+    # Map file paths to their probability index
+    prob_map = dict(zip(current_items, prob_values))
     # ---
 
     # Sort by top losses
@@ -179,7 +223,6 @@ def _(Path, dls, learn, mo, select_category, select_split, torch):
     wanted_idx = vocab.o2i[select_category.value]
 
     # Create a mask for the specific category
-    # and apply to get indices sorted by loss
     mask = targs[idxs] == wanted_idx
     top_idxs = idxs[mask]
     top_idxs_list = top_idxs.tolist()
@@ -188,7 +231,7 @@ def _(Path, dls, learn, mo, select_category, select_split, torch):
     all_items = dls.train.items if ds_idx == 0 else dls.valid.items
     model_high_loss_items = [all_items[i] for i in top_idxs_list]
 
-    # Append dummy images
+    # --- APPEND DUMMY IMAGES ---
     dummy_path = Path(f"data/{select_category.value}")
     dummy_items = []
 
@@ -201,8 +244,10 @@ def _(Path, dls, learn, mo, select_category, select_split, torch):
     top_items = dummy_items + model_high_loss_items
     # ---------------------------
     # --- VISUALIZATION ---
-    # Create a header
-    header = mo.md(f"**Showing top high-loss images + dummy images for: {select_category.value} ({select_split.value})**")
+    # 1. Create a header
+    header = mo.md(
+        f"**Showing top high-loss images + dummy images for: {select_category.value} ({select_split.value})**"
+    )
 
     # Create a gallery of the first 5 images found
     if top_items:
@@ -214,18 +259,26 @@ def _(Path, dls, learn, mo, select_category, select_split, torch):
             # how marimo handles image
             img = mo.image(src=str(x), width="100px", rounded=True)
             loss_val = loss_map.get(x, None)
+            prob_val = prob_map.get(x, None)
 
-            if loss_val is not None:
-                loss_label = f"<span style='color:red; font-weight:bold;'>Loss: {loss_val:.2f}</span>"
-            else:
-                loss_label = "<span style='color:blue; font-weight:bold;'>Dummy (No Loss)</span>"
-
+            if loss_val is not None:  # real image from the model
+                loss_html = f"<span style='color:red; font-weight:bold;'>Loss: {loss_val:.2f}</span>"
+                # Shows how confident the model was
+                prob_html = f"<span style='color:orange; font-size:9px;'>Probability: {prob_val:.2f}</span>"
+            else:  # dummy image
+                loss_html = (
+                    "<span style='color:blue; font-weight:bold;'>Dummy (No Loss)</span>"
+                )
+                prob_html = (
+                    "<span style='color:#999; font-size:9px;'>(No Probability)</span>"
+                )
 
             # The Text (Filename)
             # small font size and word-wrap to ensure paths don't break the layout
             txt = mo.md(
                 f"<div style='font-size: 10px; width: 100px; overflow-wrap: break-word; line-height: 1.1;'>"
                 f"{loss_label}<br/>"
+                f"{prob_html}<br/>"
                 f"{x.name}"
                 f"</div>"
             )
@@ -251,7 +304,7 @@ def _(Path, dls, learn, mo, select_category, select_split, torch):
     # Render the output explicitly
     # Using mo.output.replace to force display to return variables implicitly
     mo.output.replace(display_output)
-    return dl, top_items
+    return (top_items,)
 
 
 @app.cell
