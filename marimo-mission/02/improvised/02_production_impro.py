@@ -277,7 +277,7 @@ def _(
             # small font size and word-wrap to ensure paths don't break the layout
             txt = mo.md(
                 f"<div style='font-size: 10px; width: 100px; overflow-wrap: break-word; line-height: 1.1;'>"
-                f"{loss_label}<br/>"
+                f"{loss_html}<br/>"
                 f"{prob_html}<br/>"
                 f"{x.name}"
                 f"</div>"
