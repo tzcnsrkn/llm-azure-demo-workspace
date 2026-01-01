@@ -83,8 +83,8 @@ def _():
 
 @app.cell
 def _(Path):
-    # Setup path (Assuming the 'bears' folder exists)
-    path = Path('bears')
+    # Setup path (Assuming the 'datasets/bears' folder exists)
+    path = Path('datasets/bears')
     return (path,)
 
 
