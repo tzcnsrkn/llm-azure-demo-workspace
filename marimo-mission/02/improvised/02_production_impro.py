@@ -79,8 +79,8 @@ def _():
 @app.cell
 def _(Path):
 
-    # Setup path (Assuming the 'bears' folder exists)
-    path = Path('/root/workspace/bears')
+    # Setup path (Assuming the 'datasets/bears' folder exists)
+    path = Path('datasets/bears')
     return (path,)
 
 
@@ -241,7 +241,7 @@ def _(
     all_items = dls.train.items if ds_idx == 0 else dls.valid.items
     model_high_loss_items = [all_items[i] for i in top_idxs_list]
 
-    # --- APPEND DUMMY IMAGES ---
+    # --- Append Dummy Images (if any provided) ---
     dummy_path = Path(f"data/{select_category.value}")
     dummy_items = []
 
