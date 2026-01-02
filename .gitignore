@@ -1,3 +1,6 @@
+# --- Dataset ---
+datasets/
+
 # --- General & Credentials ---
 .env
 .env.*
@@ -30,3 +33,7 @@ ENV/
 /chapters-my-work
 /temp.py
 **/__marimo__/session/*.py.json
+.terraform/providers/registry.terraform.io/hashicorp/random/3.7.2/windows_amd64/terraform-provider-random_v3.7.2_x5.exe
+.terraform/providers/registry.terraform.io/hashicorp/azurerm/3.117.1/windows_amd64/terraform-provider-azurerm_v3.117.1_x5.exe
+.terraform/providers/registry.terraform.io/hashicorp/azurerm/3.117.1/windows_amd64/LICENSE.txt
+.terraform/providers/registry.terraform.io/hashicorp/random/3.7.2/windows_amd64/LICENSE.txt
