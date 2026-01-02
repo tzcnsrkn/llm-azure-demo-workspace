@@ -33,7 +33,7 @@ cd workspace
 # Terraform uploaded your local datasets to /home/azuser/datasets_upload
 # We must move them into the cloned workspace/datasets folder.
 # We assume the admin user is 'azuser' based on standard Azure defaults.
-UPLOAD_DIR="."
+UPLOAD_DIR="/home/azuser/datasets_upload"
 
 if [ -d "$UPLOAD_DIR" ]; then
     echo "Found uploaded datasets at $UPLOAD_DIR. Merging into workspace..."
@@ -66,3 +66,4 @@ mkdir -p ~/.marimo && echo -e "[display]\ntheme = \"dark\"\ncode_editor_font_siz
 # Start marimo editor
 # Using nohup to ensure it keeps running if the session disconnects
 nohup marimo edit marimo-mission/02/improvised/02_production_impro.py --host 0.0.0.0 --port 2718 --no-token > marimo.log 2>&1 &
+
