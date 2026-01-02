@@ -33,7 +33,7 @@ cd workspace
 # Terraform uploaded your local datasets to /home/azuser/datasets_upload
 # We must move them into the cloned workspace/datasets folder.
 # We assume the admin user is 'azuser' based on standard Azure defaults.
-UPLOAD_DIR="/home/azuser/datasets_upload"
+UPLOAD_DIR="."
 
 if [ -d "$UPLOAD_DIR" ]; then
     echo "Found uploaded datasets at $UPLOAD_DIR. Merging into workspace..."
