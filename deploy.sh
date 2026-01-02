@@ -16,6 +16,7 @@ export HOME=/root
 # Update apt (non-interactive to prevent debconf errors)
 export DEBIAN_FRONTEND=noninteractive
 sudo apt update
+sudo apt install -y python3.10-venv
 
 # Azure extension runs as root
 cd $HOME 
@@ -66,4 +67,5 @@ mkdir -p ~/.marimo && echo -e "[display]\ntheme = \"dark\"\ncode_editor_font_siz
 # Start marimo editor
 # Using nohup to ensure it keeps running if the session disconnects
 nohup marimo edit marimo-mission/02/improvised/02_production_impro.py --host 0.0.0.0 --port 2718 --no-token > marimo.log 2>&1 &
+
 
