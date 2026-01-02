@@ -19,7 +19,7 @@ def _():
     import matplotlib.pyplot as plt
     import requests
     import torch
-    from fastai.vision.all import error_rate, resnet18
+    from fastai.vision.all import error_rate, resnet18, set_seed
     from fastai.vision.widgets import I
     from fastbook import (
         CategoryBlock,
@@ -45,6 +45,7 @@ def _():
         vision_learner,
     )
     from fastcore.basics import Inf
+    from fastai.callback.tracker import SaveModelCallback
 
     # from fastdownload import download_u
     from PIL import Image, ImageDraw, ImageFont
@@ -61,6 +62,7 @@ def _():
         RandomResizedCrop,
         RandomSplitter,
         Resize,
+        SaveModelCallback,
         aug_transforms,
         error_rate,
         get_image_files,
@@ -68,6 +70,7 @@ def _():
         os,
         parent_label,
         resnet18,
+        set_seed,
         show_plots,
         shutil,
         torch,
@@ -95,6 +98,7 @@ def _(Path, get_image_files, path, verify_images):
     failed.map(Path.unlink)
     log_output.append(f"Removed {len(failed)} corrupt images.")
     # --------------------
+    print("\n".join(log_output))
     return
 
 
@@ -110,12 +114,16 @@ def _(
     get_image_files,
     parent_label,
     path,
+    set_seed,
 ):
+    # Setting the seed for EVERYTHING globally.
+    set_seed(42, reproducible=True)
+
     # Define DataBlock
     bears = DataBlock(
         blocks=(ImageBlock, CategoryBlock),
         get_items=get_image_files,
-        splitter=RandomSplitter(valid_pct=0.2, seed=42),
+        splitter=RandomSplitter(valid_pct=0.2), # Global seed handles this now
         get_y=parent_label,
         item_tfms=Resize(128),
     )
@@ -131,14 +139,16 @@ def _(
 
 
 @app.cell
-def _(dls, error_rate, resnet18, vision_learner):
+def _(SaveModelCallback, dls, error_rate, resnet18, vision_learner):
     # should_stop = True
     # mo.stop(should_stop, mo.md("Execution stopped. Testing the previous cells only."))
 
     # Train Model
     # https://docs.fast.ai/vision.learner.html#cnn_learner
     learn = vision_learner(dls, resnet18, metrics=error_rate)
-    learn.fine_tune(4)
+
+    # monitor='error_rate' ensures we keep the model with the lowest error
+    learn.fine_tune(4, cbs=SaveModelCallback(monitor='error_rate'))
     return (learn,)
 
 
@@ -168,7 +178,7 @@ def _(mo):
     )
 
     select_category = mo.ui.dropdown(
-        options=["black", "grizzly", "teddy"], value="teddy", label="Category"
+        options=["black", "grizzly", "teddy"], value="black", label="Category"
     )
 
     mo.hstack([select_split, select_category])
@@ -482,6 +492,27 @@ def _(
         result_msg = mo.md(f"✅ **Moved {moved_count} images to '{target_cat}'.**")
 
     result_msg
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Once ready, export your model
+    """)
+    return
+
+
+@app.cell
+def _(learn):
+    learn.export()
+    return
+
+
+@app.cell
+def _(Path):
+    path_model = Path()
+    path_model.ls(file_exts='.pkl')
     return
 
 
