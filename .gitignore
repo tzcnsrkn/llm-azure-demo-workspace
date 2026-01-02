@@ -1,6 +1,3 @@
-# --- Dataset ---
-datasets/
-
 # --- General & Credentials ---
 .env
 .env.*
