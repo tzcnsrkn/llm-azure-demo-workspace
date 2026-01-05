@@ -7,3 +7,4 @@ nbdev>=0.2.12
 pandas
 scikit_learn
 sentencepiece
+redis
