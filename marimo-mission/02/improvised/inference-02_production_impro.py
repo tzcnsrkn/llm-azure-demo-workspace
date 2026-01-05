@@ -65,10 +65,10 @@ def _(redis):
         """Establishes a connection to the Redis server."""
         try:
             r = redis.Redis(
-                host="redis-11744.c53156.eu-central-1-mz.ec2.cloud.rlrcp.com",
-                port=11744,
-                password="8NhfcLwBJZvoM6yEBfyMozGn5TgPK5kN",
-                decode_responses=False,
+                host="<redis-host>", 
+                port=11744, 
+                password="<redis-database-passwd>",
+                decode_responses=False
             )
 
             # WARNING: This deletes EVERYTHING in Redis
