@@ -3,10 +3,10 @@ import os
 
 # ================= CONFIGURATION =================
 # Redis Connection Details
-REDIS_HOST = 'redis-11744.c53156.eu-central-1-mz.ec2.cloud.rlrcp.com'
+REDIS_HOST = '<redis_cloud_host>'
 REDIS_PORT = 11744
 REDIS_DB = 0
-REDIS_PASSWORD = '8NhfcLwBJZvoM6yEBfyMozGn5TgPK5kN'
+REDIS_PASSWORD = '<password>'
 
 # Use raw strings (r"...") for Windows to handle backslashes correctly
 ROOT_FOLDER_PATH = r"..\marimo-mission\02\improvised\dataset_cleaned_by_model\bears"
