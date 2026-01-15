@@ -5,7 +5,6 @@ import os
 # Redis Connection Details
 REDIS_HOST = '<redis_cloud_host>'
 REDIS_PORT = 11744
-REDIS_DB = 0
 REDIS_PASSWORD = '<password>'
 
 # Use raw strings (r"...") for Windows to handle backslashes correctly
