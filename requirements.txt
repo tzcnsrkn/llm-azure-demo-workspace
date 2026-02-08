@@ -9,3 +9,4 @@ scikit_learn
 sentencepiece
 redis
 gdown
+seaborn
