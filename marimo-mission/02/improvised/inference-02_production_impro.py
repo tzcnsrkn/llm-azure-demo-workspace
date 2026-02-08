@@ -174,7 +174,7 @@ def _(io, mo, os, re, requests):
         api_url: str = "http://74.248.24.95:8080/images",
         download_path: str = "downloaded_images",
         workers: int = 16,
-        timeout: int = 30, # Increased timeout for large zip downloads
+        timeout: int = 300, # Increased timeout for large zip downloads
         headers: dict | None = None,
     ):
         """

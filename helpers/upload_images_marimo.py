@@ -33,7 +33,7 @@ def _():
         "/cache",
     )
 
-    ROOT = r"C:\Workspaces\LLMs_ML\llm-azure-demo-workspace\marimo-mission\02\improvised\dataset_cleaned_by_model\bears\black"
+    ROOT = r"C:\Workspaces\LLMs_ML\llm-azure-demo-workspace\marimo-mission\02\improvised\dataset_cleaned_by_model\bears"
     TTL_SECONDS = 3600
     WORKERS = 8
 
