@@ -16,7 +16,6 @@ export HOME=/root
 # Update apt (non-interactive to prevent debconf errors)
 export DEBIAN_FRONTEND=noninteractive
 sudo apt update
-sudo apt install -y python3.10-venv
 
 # Azure extension runs as root
 cd $HOME 
@@ -62,10 +61,8 @@ pip install fastai jupyter marimo
 pip install -r requirements.txt
 
 # Configure marimo
-mkdir -p ~/.marimo && echo -e "[display]\ntheme = \"dark\"\ncode_editor_font_size = 16\n\n[runtime]\nauto_instantiate = true" > ~/.marimo/marimo.toml
+mkdir -p ~/.marimo && echo -e "[display]\ntheme = \"dark\"\ncode_editor_font_size = 16" > ~/.marimo/marimo.toml
 
-# Start marimo editor
+# Start marimo editor [[4]](https://docs.marimo.io/guides/configuration/runtime_configuration/)[[5]](https://github.com/marimo-team/marimo/issues/7174)
 # Using nohup to ensure it keeps running if the session disconnects
 nohup marimo edit marimo-mission/02/improvised/02_production_impro.py --host 0.0.0.0 --port 2718 --no-token > marimo.log 2>&1 &
-
-
