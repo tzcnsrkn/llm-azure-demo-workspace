@@ -78,7 +78,7 @@
     apt-get install -y --no-install-recommends python3.10-venv
     
     # Create and activate virtual environment
-    python3.10 -m venv venv
+    python3 -m venv venv
     source venv/bin/activate
 
     # Upgrade pip and install main packages
@@ -99,6 +99,7 @@
     nohup marimo edit marimo-mission/02/improvised/02_production_impro.py --host 0.0.0.0 --port 2718 --no-token > marimo.log 2>&1 &
 
     echo "Deployment script finished successfully."
+
 
 
 
