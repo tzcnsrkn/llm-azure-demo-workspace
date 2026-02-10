@@ -15,7 +15,18 @@ export HOME=/root
 
 # Update apt (non-interactive to prevent debconf errors)
 export DEBIAN_FRONTEND=noninteractive
-sudo apt update
+export HOME=/root
+
+# Disable broken Scala/sbt repo (scala.jfrog.io) if present
+for f in /etc/apt/sources.list /etc/apt/sources.list.d/*.list; do
+  [ -f "$f" ] || continue
+  if grep -q 'scala\.jfrog\.io' "$f"; then
+    echo "Disabling scala.jfrog.io in $f"
+    sed -i.bak '/scala\.jfrog\.io/ { /^[[:space:]]*#/! s|^[[:space:]]*|# | }' "$f"
+  fi
+done
+
+sudo apt-get update || echo "WARNING: apt-get update failed; continuing anyway..."
 
 # Azure extension runs as root
 cd $HOME 
