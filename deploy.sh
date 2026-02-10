@@ -15,7 +15,6 @@
 
     # Update apt (non-interactive to prevent debconf errors)
     export DEBIAN_FRONTEND=noninteractive
-    sudo apt update
 
     # Azure extension runs as root
     cd $HOME 
@@ -71,3 +70,4 @@
     nohup marimo edit marimo-mission/02/improvised/02_production_impro.py --host 0.0.0.0 --port 2718 --no-token > marimo.log 2>&1 &
 
     echo "Deployment script finished successfully."
+
