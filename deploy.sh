@@ -47,6 +47,32 @@
         echo "Warning: No uploaded datasets found at $UPLOAD_DIR. Using repository defaults."
     fi
     # -----------------------------------------------------------------------------
+    export DEBIAN_FRONTEND=noninteractive
+    export NEEDRESTART_MODE=a
+    
+    # wait for first-boot tasks that often hold dpkg/apt locks
+    if command -v cloud-init >/dev/null 2>&1; then
+      cloud-init status --wait || true
+    fi
+    
+    while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1 || fuser /var/lib/apt/lists/lock >/dev/null 2>&1; do
+      echo "Waiting for apt/dpkg lock..."
+      sleep 5
+    done
+    
+    # retry update (transient 404/hash-mismatch happens on mirrors)
+    for i in 1 2 3 4 5; do
+      echo "apt-get update attempt $i/5"
+      if apt-get -o Acquire::Retries=5 -o Dpkg::Use-Pty=0 -y update; then
+        break
+      fi
+      rm -rf /var/lib/apt/lists/*
+      sleep 10
+    done
+    
+    dpkg --configure -a || true
+    
+    apt-get -o Dpkg::Use-Pty=0 -y install --no-install-recommends python3-venv
 
     apt-get update
     apt-get install -y --no-install-recommends python3.10-venv
@@ -73,5 +99,6 @@
     nohup marimo edit marimo-mission/02/improvised/02_production_impro.py --host 0.0.0.0 --port 2718 --no-token > marimo.log 2>&1 &
 
     echo "Deployment script finished successfully."
+
 
 
