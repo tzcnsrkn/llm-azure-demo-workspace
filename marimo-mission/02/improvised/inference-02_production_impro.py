@@ -78,7 +78,7 @@ def _():
 @app.cell
 def _():
     # Replace with your actual VM Public IP
-    BASE_URL = "http://74.248.24.66"
+    BASE_URL = "http://20.215.248.72"
     API_BASE_URL = f'{BASE_URL}:8080/images'
     print(f"Targeting Cache API at: {API_BASE_URL}")
     return (API_BASE_URL,)
@@ -164,14 +164,14 @@ def _(connect_cache):
 
 
 @app.cell
-def _(io, mo, os, re, requests):
+def _(API_BASE_URL, io, mo, os, re, requests):
     import hashlib
     import zipfile
     from urllib.parse import urljoin, quote
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
     def download_all_images_cache_api(
-        api_url: str = "http://74.248.24.95:8080/images",
+        api_url: str = API_BASE_URL,
         download_path: str = "downloaded_images",
         workers: int = 16,
         timeout: int = 300, # Increased timeout for large zip downloads

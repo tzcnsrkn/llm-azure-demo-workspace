@@ -1,11 +1,11 @@
 terraform {
+  required_version = ">= 1.0.0"
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "~> 3.0"
     }
-    # While Terraform often downloads this automatically, 
-    # it is good practice to declare the random provider.
     random = {
       source  = "hashicorp/random"
       version = "~> 3.0"
@@ -19,7 +19,7 @@ provider "azurerm" {
 
 # --- Variables ---
 variable "resource_group_name" {
-  default = "demo-rg-dsvm-llm-02"
+  default = "demo-rg-dsvm-llm-01"
 }
 
 variable "location" {
@@ -27,7 +27,7 @@ variable "location" {
 }
 
 variable "vm_name" {
-  default = "demo-dsvm-llm-02"
+  default = "demo-dsvm-llm-01"
 }
 
 variable "vm_size" {
@@ -38,7 +38,6 @@ variable "admin_username" {
   default = "azuser"
 }
 
-# Pass your public key file content or raw string here
 variable "ssh_public_key" {
   description = "The SSH public key data."
   type        = string
@@ -48,7 +47,7 @@ variable "ssh_public_key" {
 variable "github_repo_url" {
   description = "The HTTP URL of the GitHub repository"
   type        = string
-  default = "https://github.com/tzcnsrkn/llm-azure-demo-workspace.git"
+  default     = "https://github.com/tzcnsrkn/llm-azure-demo-workspace.git"
 }
 
 variable "github_dataset_path" {
@@ -65,9 +64,9 @@ resource "azurerm_resource_group" "rg" {
   location = var.location
 }
 
-# 2. Networking (VNet, Subnet, Public IP, NSG)
+# 2. Networking
 resource "azurerm_virtual_network" "vnet" {
-  name                = "${var.vm_name}-vnet-02"
+  name                = "${var.vm_name}-vnet-01"
   address_space       = ["10.0.0.0/16"]
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
@@ -80,18 +79,16 @@ resource "azurerm_subnet" "subnet" {
   address_prefixes     = ["10.0.0.0/24"]
 }
 
-# Used to generate a unique string similar to uniqueString() in Bicep
 resource "random_id" "id" {
   byte_length = 4
 }
 
 resource "azurerm_public_ip" "pip" {
-  name                = "${var.vm_name}-ip-02"
+  name                = "${var.vm_name}-ip-01"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
   allocation_method   = "Static"
   sku                 = "Standard"
-  # FIXED: Changed unique_id.id.hex to random_id.id.hex
   domain_name_label   = lower("${var.vm_name}-${substr(random_id.id.hex, 0, 6)}")
 }
 
@@ -144,12 +141,12 @@ resource "azurerm_subnet_network_security_group_association" "nsg_assoc" {
 
 # 3. Network Interface
 resource "azurerm_network_interface" "nic" {
-  name                = "${var.vm_name}-nic-02"
+  name                = "${var.vm_name}-nic-01"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
   ip_configuration {
-    name                          = "ipconfig1-02"
+    name                          = "ipconfig-01"
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Dynamic"
     public_ip_address_id          = azurerm_public_ip.pip.id
@@ -163,8 +160,6 @@ resource "azurerm_linux_virtual_machine" "vm" {
   location            = azurerm_resource_group.rg.location
   size                = var.vm_size
   admin_username      = var.admin_username
-  
-  # Ensure SSH authentication is used
   disable_password_authentication = true
 
   network_interface_ids = [
@@ -182,7 +177,6 @@ resource "azurerm_linux_virtual_machine" "vm" {
     disk_size_gb         = 150
   }
 
-  # Matches your Bicep imageReference
   source_image_reference {
     publisher = "microsoft-dsvm"
     offer     = "ubuntu-2204"
@@ -202,10 +196,9 @@ resource "azurerm_virtual_machine_extension" "setup_full_environment" {
   auto_upgrade_minor_version = true
 
   settings = jsonencode({
-    "fileUris": [
-      "https://raw.githubusercontent.com/tzcnsrkn/llm-azure-demo-workspace/refs/heads/main/deploy.sh"
-    ]
-  })
+  fileUris   = ["https://raw.githubusercontent.com/tzcnsrkn/llm-azure-demo-workspace/refs/heads/main/deploy.sh"]
+  timestamp  = 2
+})
 
   protected_settings = jsonencode({
     "commandToExecute": "bash deploy.sh"
